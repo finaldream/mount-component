@@ -1,0 +1,31 @@
+{
+  "name": "mount-component",
+  "version": "1.0.0",
+  "description": "Mounts React and plain Javascript components to HTML-DOM elements",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/finaldream/mount-component.git"
+  },
+  "keywords": [
+    "React",
+    "Component",
+    "mount",
+    "DOM"
+  ],
+  "author": "Oliver Erdmann",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/finaldream/mount-component/issues"
+  },
+  "homepage": "https://github.com/finaldream/mount-component#readme",
+  "peerDependencies": {
+    "react": "^15.1.0"
+  },
+  "dependencies": {
+    "camelcase": "^3.0.0"
+  }
+}
