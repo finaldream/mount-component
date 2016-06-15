@@ -35,7 +35,7 @@ function getProps(el) {
         try {
             value = JSON.parse(value);
         } catch (e) {
-            continue;
+            // noop
         }
 
         result[propName] = value;
