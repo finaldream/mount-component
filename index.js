@@ -1,10 +1,20 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
-const camelcase = require('camelcase');
+/**
+ * Mounts React and plain Javascript components to HTML-DOM elements. Each component
+ * receives any data-attribute on it's mount-tag as props.
+ *
+ * Based on https://github.com/finaldream/mount-component
+ *
+ * @author Oliver Erdmann, <o.erdmann@finaldream.de>
+ * @since 22.06.2016
+ */
 
-const DATA_ATTR_REGEX = /^data-([\w-_]*)/i;
-const components = new Map();
 
+var React = require('react');
+var ReactDOM = require('react-dom');
+var camelcase = require('camelcase');
+
+var DATA_ATTR_REGEX = /^data-([\w-_]*)/i;
+var components = [];
 
 /**
  * Gets props for element
@@ -14,7 +24,7 @@ const components = new Map();
  */
 function getProps(el) {
 
-    const result = {};
+    var result = {};
 
     if (!el.hasAttributes()) {
         return result;
@@ -53,7 +63,7 @@ function getProps(el) {
  * Tries to parse JSON for props, passes values as objects on success, as string otherwise.
  * Provides a references to the mounted node as `this.props.mountNode`.
  *
- * Will also instantiate non-React-Components, by passing the mounted node and props to the constructor.
+ * Will also instantiate non-React-Components, by passing the mounted node and props to the varructor.
  *
  * @param {string}                 selector  Selector to convert into react-components
  * @param {React.Component|string|function} component The (un-instantiated) React-Component, it's name or any
@@ -95,7 +105,6 @@ function mountComponent(selector, component) {
         );
 
     }
-
 }
 
 
@@ -107,8 +116,11 @@ function mountComponent(selector, component) {
  */
 function registerComponent(selector, component) {
 
-    components.set(selector, component);
+    var reactComponent = {};
+    reactComponent.selector = selector;
+    reactComponent.component = component;
 
+    components.push(reactComponent);
 }
 
 /**
@@ -116,12 +128,9 @@ function registerComponent(selector, component) {
  */
 function mountAll() {
 
-    for (const [selector, component] of components) {
-
-        mountComponent(selector, component);
-
-    }
-
+    components.forEach(function(component) {
+        mountComponent(component.selector, component.component);
+    });
 }
 
 module.exports = {
