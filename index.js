@@ -178,7 +178,7 @@ function mountAll() {
 }
 
 module.exports = {
-    mountComponent,
-    registerComponent,
-    mountAll,
+    mountComponent: mountComponent,
+    registerComponent: registerComponent,
+    mountAll: mountAll,
 };
