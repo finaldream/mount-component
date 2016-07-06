@@ -17,14 +17,58 @@ var DATA_ATTR_REGEX = /^data-([\w-_]*)/i;
 var components = [];
 
 /**
+ * Resolves a named attribute from an Element.
+ *
+ * @private
+ * @param {Element} element Element to get the attribute from
+ * @param {String} name Name of the attribute (key)
+ * @param {*} [defaultValue] Optional value returned if the attribute dones nt exists.
+ *
+ * @returns {*} The attribute's value or defaultValue
+ */
+function getNamedAttribute(element, name, defaultValue) {
+
+    if (!element || !element.attributes || !element.attributes.getNamedItem) {
+        return defaultValue;
+    }
+
+    return child.attributes.getNamedItem(name) ?
+           child.attributes.getNamedItem(name).nodeValue :
+           defaultValue;
+}
+
+/**
  * Gets props for element
  *
+ * @private
  * @param {Element} el Element to get props for
  * @returns {object}
  */
 function getProps(el) {
 
     var result = {};
+
+    var children = el.children;
+    for (var i = 0; i < children.length; i++) {
+
+        var child = children[i];
+
+        if (child &&
+            child.tagName.toLowerCase() === 'script' &&
+            getNamedAttribute(child, 'type') === 'application/json'
+        ) {
+            var key = getNamedAttribute(child, 'id',
+                getNamedAttribute(child, 'data-id', 'json')
+            );
+
+            key = camelcase(key);
+
+            try {
+                var content = child.innerHTML;
+                result[key] = JSON.parse(content);
+            } catch(e) {}
+        }
+    }
 
     if (!el.hasAttributes()) {
         return result;
@@ -134,7 +178,7 @@ function mountAll() {
 }
 
 module.exports = {
-    mountComponent: mountComponent,
-    registerComponent: registerComponent,
-    mountAll: mountAll,
+    mountComponent,
+    registerComponent,
+    mountAll,
 };
