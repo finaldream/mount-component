@@ -32,8 +32,8 @@ function getNamedAttribute(element, name, defaultValue) {
         return defaultValue;
     }
 
-    return child.attributes.getNamedItem(name) ?
-           child.attributes.getNamedItem(name).nodeValue :
+    return element.attributes.getNamedItem(name) ?
+           element.attributes.getNamedItem(name).nodeValue :
            defaultValue;
 }
 
