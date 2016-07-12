@@ -112,21 +112,24 @@ function getProps(el) {
  * @param {string}                 selector  Selector to convert into react-components
  * @param {React.Component|string|function} component The (un-instantiated) React-Component, it's name or any
  *                                                    non-react function(node: Element, props: Object)
+ * @return {function|array|null} The instance, if one result, an array of instances for multiple results, null for no results.
  */
 function mountComponent(selector, component) {
 
     var elements = document.querySelectorAll(selector);
 
     if (!elements || !elements.length) {
-        return;
+        return null;
     }
+
+    var result = [];
 
     for (var i = 0, l = elements.length; i < l; i++) {
 
         var el = elements[i];
 
         if (!el) {
-            return;
+            continue;
         }
 
         var props = getProps(el);
@@ -137,7 +140,7 @@ function mountComponent(selector, component) {
         if (!component.prototype.isReactComponent) {
 
             /*eslint no-new: 0*/
-            new component(el, props);
+            result.push(new component(el, props));
 
             continue;
         }
@@ -148,7 +151,19 @@ function mountComponent(selector, component) {
             el
         );
 
+        result.push(reactElement);
+
     }
+
+    if (!result.length) {
+        return null;
+    }
+
+    if (result.length === 1) {
+        return result[0];
+    }
+
+    return result;
 }
 
 
