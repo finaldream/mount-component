@@ -112,13 +112,19 @@ function getProps(el) {
  * @param {string}                 selector  Selector to convert into react-components
  * @param {React.Component|string|function} component The (un-instantiated) React-Component, it's name or any
  *                                                    non-react function(node: Element, props: Object)
+ * @param {object} [properties] Optional props to be passed to a component.
+ *                              Tag-bound props will take precedence.
  * @return {function|array|null} The instance, if one result, an array of instances for multiple results, null for no results.
  */
-function mountComponent(selector, component) {
+function mountComponent(selector, component, properties) {
 
     var elements = document.querySelectorAll(selector);
 
-    if (!elements || !elements.length) {
+    if (!elements ||
+        !elements.length ||
+        !component ||
+        !component.prototype
+    ) {
         return null;
     }
 
@@ -133,6 +139,10 @@ function mountComponent(selector, component) {
         }
 
         var props = getProps(el);
+
+        if (typeof properties !== 'undefined') {
+            props = Object.assign({}, properties, props);
+        }
 
         props.mountNode = el;
 
