@@ -22,8 +22,9 @@
     "url": "https://github.com/finaldream/mount-component/issues"
   },
   "homepage": "https://github.com/finaldream/mount-component#readme",
-  "peerDependencies": {
-    "react": "^15.1.0"
+  "optionalDependencies": {
+    "react": ">15.1.0",
+    "react-dom": ">15.1.0"
   },
   "dependencies": {
     "camelcase": "^3.0.0"

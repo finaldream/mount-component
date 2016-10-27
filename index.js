@@ -8,9 +8,16 @@
  * @since 22.06.2016
  */
 
+var React;
+var ReactDOM;
 
-var React = require('react');
-var ReactDOM = require('react-dom');
+/* safe-guard optional dependencies */
+try{
+    React = require('react');
+    ReactDOM = require('react-dom');
+} catch (e) {}
+
+
 var camelcase = require('camelcase');
 
 var DATA_ATTR_REGEX = /^data-([\w-_]*)/i;
@@ -101,7 +108,7 @@ function getProps(el) {
 }
 
 /**
- * Mounts React-Components for all elements matching the selector.
+ * Mounts React- or Pure-JS-Components for all elements matching the selector.
  * Any data-attributes will be passed as props, prop-names are converted to camelcase,
  * with the 'data-' part stripped off (eg. "data-base-path" will become "basePath").
  * Tries to parse JSON for props, passes values as objects on success, as string otherwise.
@@ -147,11 +154,15 @@ function mountComponent(selector, component, properties) {
         props.mountNode = el;
 
         // Allows mounting non-react components
-        if (!component.prototype.isReactComponent) {
+        if (!React || (!!React && !component.prototype.isReactComponent)) {
 
             /*eslint no-new: 0*/
             result.push(new component(el, props));
 
+            continue;
+        }
+
+        if (!React) {
             continue;
         }
 
@@ -185,11 +196,11 @@ function mountComponent(selector, component, properties) {
  */
 function registerComponent(selector, component) {
 
-    var reactComponent = {};
-    reactComponent.selector = selector;
-    reactComponent.component = component;
+    var item = {};
+    item.selector = selector;
+    item.component = component;
 
-    components.push(reactComponent);
+    components.push(item);
 }
 
 /**
@@ -197,8 +208,8 @@ function registerComponent(selector, component) {
  */
 function mountAll() {
 
-    components.forEach(function(component) {
-        mountComponent(component.selector, component.component);
+    components.forEach(function(item) {
+        mountComponent(item.selector, item.component);
     });
 }
 
