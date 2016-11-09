@@ -8,6 +8,8 @@
  * @since 22.06.2016
  */
 
+"use strict";
+
 var React;
 var ReactDOM;
 
@@ -45,6 +47,35 @@ function getNamedAttribute(element, name, defaultValue) {
 }
 
 /**
+ * loads JSON from a given element
+ *
+ * @param el
+ * @returns {*}
+ */
+function loadJson(el) {
+
+    if (!el ||
+        el.tagName.toLowerCase() !== 'script' ||
+        getNamedAttribute(el, 'type') !== 'application/json'
+    ) {
+        return null;
+    }
+
+    var result = {};
+
+    // Get the key-name from `data-name`, `name`, default is "data"
+    var key = camelcase(getNamedAttribute(el, 'data-name', 'data'));
+
+    try {
+        var content = el.innerHTML;
+        result[key] = JSON.parse(content);
+    } catch(e) {}
+
+    return result;
+
+}
+
+/**
  * Gets props for element
  *
  * @private
@@ -53,28 +84,22 @@ function getNamedAttribute(element, name, defaultValue) {
  */
 function getProps(el) {
 
-    var result = {};
+    // Try if the mounting-node is a script/json tag ...
+    var result = loadJson(el);
 
-    var children = el.children;
-    for (var i = 0; i < children.length; i++) {
+    // ... if not, examine the children.
+    if (result === null) {
 
-        var child = children[i];
+        result = {};
 
-        if (child &&
-            child.tagName.toLowerCase() === 'script' &&
-            getNamedAttribute(child, 'type') === 'application/json'
-        ) {
-            var key = getNamedAttribute(child, 'id',
-                getNamedAttribute(child, 'data-id', 'json')
-            );
+        var children = el.children;
+        for (var i = 0; i < children.length; i++) {
 
-            key = camelcase(key);
+            var json = loadJson(children[i] || {});
+            Object.assign(result, json);
 
-            try {
-                var content = child.innerHTML;
-                result[key] = JSON.parse(content);
-            } catch(e) {}
         }
+
     }
 
     if (!el.hasAttributes()) {
@@ -157,7 +182,7 @@ function mountComponent(selector, component, properties) {
         if (!React || (!!React && !component.prototype.isReactComponent)) {
 
             /*eslint no-new: 0*/
-            result.push(new component(el, props));
+            result.push(new component(props, el));
 
             continue;
         }

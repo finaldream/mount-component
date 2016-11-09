@@ -1,13 +1,16 @@
 # Mount Component
 
-Mounts React- and plain Javascript components to HTML-DOM elements, making them usable in a way WebComponents would be used.
-Components can be of type React.Component or any given self-contained function.
+Binds Javascript- and React-Components to HTML-DOM elements, making them usable similar to WebComponents.
+A "component" can be any Javascript-Constructor or React-Components.
 
 **mount-component** also takes care about initial props, passed to each component.
 Props can be defined directly on the mounting-tags in a form of `data`-attributes.
 Any available data-attribute will be passed to the component's constructor.
 It's also possible to pass larger chunks of JSON data, by placing them in dedicated
-script-tags below the mounting-node (see below).
+script-tags below or on the mounting-node (see below).
+
+## Features
+
 
 ## Usage
 
@@ -18,32 +21,29 @@ script-tags below the mounting-node (see below).
 
 ```javascript
 
-import {registerComponent, mountAll} from 'mount-component';
+import {mountComponent} from 'mount-component';
 
-// Registers a component to a custom Tag.
-registerComponent('Slider', SliderComponent);
-registerComponent('.grid', GridComponent);
-
-// Mounts all registered components to matching DOM-elements.
-mountAll();
+// Mounts components to custom tags.
+mountComponent('Slider', SliderComponent);
+mountComponent('.grid', GridComponent);
 ```
 
-## Passing large chunks of JSON-data
+## Passing chunks of JSON-data
 
 While it's possible to encode JSON into data-attributes and **mount-component**
-will actually handle this for you. There are good reasons not to use attributes
-for larger chunks of data. Instead **mount-component** recognizes dedicated
-JSON-blocks from script-tags nested inside your mounting-tags.
+will actually handle decoding them for you. There are good reasons not to use attributes
+for larger data-structures. Instead **mount-component** recognizes dedicated
+JSON-blocks nested inside or on a mounting-tag.
 
 Those Tags require to be `script`-tags with a type of "application/json" and
-an optional `id` or `data-id` set for naming the prop for this data. If you
-don't specify an `id` or `data-id`-attribute, the default will be `json`.
+an optional `data-name`-attribute set for naming the prop for the data. If you
+don't specify a `data-name`-attribute, the default prop-name will be `data`.
 
 **Example**
 
 ```html
 <MyComponent data-title="Hello World!">
-    <script type="application/json" id="my-data-prop">
+    <script type="application/json" data-name="my-prop">
         {
             "users": [
                 {"name": "Jane", "age": 24},
@@ -61,9 +61,34 @@ mountComponent('MyComponent', MyComponent);
 
 // -> props: {
 //      title: "Hello World",
-//      myDataProp: {users: [ ... ]}
+//      myProp: {users: [ ... ]}
 // }
 ```
+
+There is also support for data-only Components, that don't have a visual aspect and therefor don't require to be mounted 
+to a special DOM-element, but may need to be initialized with data from the DOM. 
+
+In that case, you can directly specify a script/Json tag as a mounting-element.
+
+```html
+<script id="tracking" type="application/json">
+    {
+        "tracking": {
+            ...
+        }
+    }
+</script>
+```
+
+```javascript
+
+mountComponent('#tracking', TrackingComponent);
+
+// -> props: {
+//      data: {tracking: { ... }}
+// }
+```
+
 
 ## API
 
@@ -84,6 +109,15 @@ Registers a component and it's selector globally.
 ### function mountAll()
 
 Mounts all registered components.
+
+## Changelog
+
+### 1.3.0
+
+* Constructor arguments on pure-JS components have been swapped, so that `props` come first.
+* The default Json-key has been changed from "json" to "data"
+* Script/Json-Tags can be mounted directly, without the need of an additional wrapper.
+* A JSON-tag's prop-name can now only be specified through the attribute `data-name`.
 
 # Authors
 
